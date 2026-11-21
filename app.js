@@ -6,6 +6,7 @@ const setup=$("setup"),auth=$("auth"),chat=$("chat");
 let supabase,currentUser,channel,isSignup=false,selectedImage=null,noticeTimer;
 function notify(m){const e=$("notice");e.textContent=m;e.classList.add("show");clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>e.classList.remove("show"),4500)}
 function setConnection(t){$("connection").textContent=t}
+function usernameEmail(name){const bytes=new TextEncoder().encode(name.trim().toLocaleLowerCase("fa"));let binary="";bytes.forEach(b=>binary+=String.fromCharCode(b));return btoa(binary).replace(/\\+/g,"-").replace(/\\//g,"_").replace(/=+$/g,"")+"@users.hamsobat.invalid";}
 function show(v){setup.classList.toggle("hidden",v!=="setup");auth.classList.toggle("hidden",v!=="auth");chat.classList.toggle("hidden",v!=="chat")}
 function setAuthMode(s){isSignup=s;$("signupTab").classList.toggle("active",s);$("loginTab").classList.toggle("active",!s);$("nameLabel").classList.toggle("hidden",!s);$("displayName").classList.toggle("hidden",!s);$("displayName").required=s;$("authSubmit").textContent=s?"ساخت حساب":"ورود";$("password").autocomplete=s?"new-password":"current-password"}
 function renderMessage(m){
@@ -24,7 +25,7 @@ async function loadMessages(){
  if(!data?.length)$("messages").innerHTML='<div class="empty">هنوز پیامی نیست. اولین پیام را بفرست!</div>';else data.forEach(renderMessage);
 }
 function subscribeMessages(){if(channel)supabase.removeChannel(channel);channel=supabase.channel("public-chat-room").on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},p=>renderMessage(p.new)).subscribe()}
-async function enterApp(u){currentUser=u;const name=u.user_metadata?.display_name||u.email?.split("@")[0]||"کاربر";$("whoAmI").textContent="واردشده با نام "+name;show("chat");await loadMessages();subscribeMessages();setConnection("متصل")}
+async function enterApp(u){currentUser=u;const name=u.user_metadata?.username||u.user_metadata?.display_name||"کاربر";$("whoAmI").textContent="واردشده با نام "+name;show("chat");await loadMessages();subscribeMessages();setConnection("متصل")}
 async function connect(url,key){
  supabase=createClient(url,key);const {data,error}=await supabase.auth.getSession();if(error)throw error;
  localStorage.setItem("ff_supabase_url",url);localStorage.setItem("ff_supabase_key",key);show("auth");setConnection("سرور متصل شد");
@@ -38,16 +39,15 @@ $("saveConfig").addEventListener("click",async()=>{
 $("loginTab").addEventListener("click",()=>setAuthMode(false));$("signupTab").addEventListener("click",()=>setAuthMode(true));setAuthMode(false);
 $("editConfig").addEventListener("click",()=>{$("supabaseUrl").value=localStorage.getItem("ff_supabase_url")||"";$("supabaseKey").value=localStorage.getItem("ff_supabase_key")||"";show("setup")});
 $("authForm").addEventListener("submit",async e=>{
- e.preventDefault();const email=$("email").value.trim(),password=$("password").value,b=$("authSubmit");b.disabled=true;
+ e.preventDefault();const username=$("username").value.trim(),password=$("password").value,b=$("authSubmit");b.disabled=true;
  try{
-  if(isSignup){const displayName=$("displayName").value.trim();const {data,error}=await supabase.auth.signUp({email,password,options:{data:{display_name:displayName}}});if(error)throw error;notify(data.session?"حساب ساخته شد.":"ثبت‌نام انجام شد؛ اگر تأیید ایمیل فعال است، ایمیلت را بررسی کن.")}
-  else{const {error}=await supabase.auth.signInWithPassword({email,password});if(error)throw error}
+  if(!username||username.length<3)throw new Error("نام کاربری باید حداقل ۳ حرف باشد.");\n  const email=usernameEmail(username);\n  if(isSignup){const {data,error}=await supabase.auth.signUp({email,password,options:{data:{display_name:username,username}}});if(error)throw error;if(!data.session){notify("ثبت‌نام انجام شد؛ برای ورود بدون ایمیل، مدیر باید تأیید ایمیل را در تنظیمات Supabase خاموش کند.");return}notify("حساب ساخته شد و وارد شد.")}\n  else{const {error}=await supabase.auth.signInWithPassword({email,password});if(error)throw new Error("نام کاربری یا رمز عبور اشتباه است.")}
  }catch(x){notify(x.message)}finally{b.disabled=false}
 });
 $("numberForm").addEventListener("submit",async e=>{
  e.preventDefault();const value=$("numberValue").value.trim();if(value===""||!Number.isFinite(Number(value)))return notify("یک عدد معتبر وارد کن.");
  const b=$("sendNumber");b.disabled=true;
- try{const username=currentUser.user_metadata?.display_name||currentUser.email?.split("@")[0]||"کاربر";
+ try{const username=currentUser.user_metadata?.username||currentUser.user_metadata?.display_name||"کاربر";
  const {error}=await supabase.from("messages").insert({user_id:currentUser.id,username,content:"🔢 عدد ثبت‌شده: "+value,image_url:null});if(error)throw error;
  $("numberValue").value="";
  }catch(x){notify("ارسال عدد انجام نشد: "+x.message)}finally{b.disabled=false}
