@@ -41,7 +41,10 @@ $("editConfig").addEventListener("click",()=>{$("supabaseUrl").value=localStorag
 $("authForm").addEventListener("submit",async e=>{
  e.preventDefault();const username=$("username").value.trim(),password=$("password").value,b=$("authSubmit");b.disabled=true;
  try{
-  if(!username||username.length<3)throw new Error("نام کاربری باید حداقل ۳ حرف باشد.");\n  const email=usernameEmail(username);\n  if(isSignup){const {data,error}=await supabase.auth.signUp({email,password,options:{data:{display_name:username,username}}});if(error)throw error;if(!data.session){notify("ثبت‌نام انجام شد؛ برای ورود بدون ایمیل، مدیر باید تأیید ایمیل را در تنظیمات Supabase خاموش کند.");return}notify("حساب ساخته شد و وارد شد.")}\n  else{const {error}=await supabase.auth.signInWithPassword({email,password});if(error)throw new Error("نام کاربری یا رمز عبور اشتباه است.")}
+  if(!username||username.length<3)throw new Error("نام کاربری باید حداقل ۳ حرف باشد.");
+  const email=usernameEmail(username);
+  if(isSignup){const {data,error}=await supabase.auth.signUp({email,password,options:{data:{display_name:username,username}}});if(error)throw error;if(!data.session){notify("ثبت‌نام انجام شد؛ برای ورود بدون ایمیل، مدیر باید تأیید ایمیل را در تنظیمات Supabase خاموش کند.");return}notify("حساب ساخته شد و وارد شد.")}
+  else{const {error}=await supabase.auth.signInWithPassword({email,password});if(error)throw new Error("نام کاربری یا رمز عبور اشتباه است.")}
  }catch(x){notify(x.message)}finally{b.disabled=false}
 });
 $("numberForm").addEventListener("submit",async e=>{
@@ -66,7 +69,7 @@ $("messageForm").addEventListener("submit",async e=>{
    const {error}=await supabase.storage.from("chat-images").upload(path,selectedImage,{contentType:selectedImage.type,upsert:false});if(error)throw error;
    image_url=supabase.storage.from("chat-images").getPublicUrl(path).data.publicUrl;
   }
-  const username=currentUser.user_metadata?.display_name||currentUser.email?.split("@")[0]||"کاربر";
+  const username=currentUser.user_metadata?.username||currentUser.user_metadata?.display_name||"کاربر";
   const {error}=await supabase.from("messages").insert({user_id:currentUser.id,username,content:content||null,image_url});if(error)throw error;
   $("messageText").value="";$("imageFile").value="";$("fileName").textContent="";selectedImage=null;
  }catch(x){notify("ارسال انجام نشد: "+x.message)}finally{b.disabled=false}
