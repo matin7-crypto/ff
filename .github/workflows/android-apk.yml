@@ -17,7 +17,7 @@ jobs:
       - uses: gradle/gradle-build-action@v3
         with:
           gradle-version: '8.7'
-          arguments: :app:assembleDebug
+          arguments: -p android :app:assembleDebug
       - uses: actions/upload-artifact@v4
         with:
           name: hamsobat-debug-apk
