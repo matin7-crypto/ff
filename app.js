@@ -1,4 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const SUPABASE_URL="https://qdjgkynzbeypogvihsbx.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_rdVhXue0W1uT_6VXppj3pw_YQGbXzkD";
 const $=id=>document.getElementById(id);
 const setup=$("setup"),auth=$("auth"),chat=$("chat");
 let supabase,currentUser,channel,isSignup=false,selectedImage=null,noticeTimer;
@@ -70,6 +72,7 @@ $("messageForm").addEventListener("submit",async e=>{
  }catch(x){notify("ارسال انجام نشد: "+x.message)}finally{b.disabled=false}
 });
 (async()=>{
- const u=localStorage.getItem("ff_supabase_url"),k=localStorage.getItem("ff_supabase_key");
- if(u&&k){$("supabaseUrl").value=u;$("supabaseKey").value=k;try{await connect(u,k)}catch(e){show("setup");setConnection("اتصال برقرار نشد");notify("اتصال ناموفق بود: "+e.message)}}else show("setup");
+ const u=localStorage.getItem("ff_supabase_url")||SUPABASE_URL,k=localStorage.getItem("ff_supabase_key")||SUPABASE_PUBLISHABLE_KEY;
+ $("supabaseUrl").value=u;$("supabaseKey").value=k;
+ try{await connect(u,k)}catch(e){show("setup");setConnection("اتصال برقرار نشد");notify("اتصال ناموفق بود: "+e.message)}
 })();
