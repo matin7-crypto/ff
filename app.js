@@ -43,7 +43,7 @@ function subscribeMessages(){
  }
 }
 function setChatMode(mode){
- chatMode=mode;$("publicMode").classList.toggle("active",mode==="public");$("privateMode").classList.toggle("active",mode==="private");
+ chatMode=mode;$("chatTitle").textContent=mode==="public"?"اتاق گفت‌وگوی عمومی":(privateRecipient?"گفتگوی خصوصی با "+privateRecipient.username:"گفت‌وگوی خصوصی");$("publicMode").classList.toggle("active",mode==="public");$("privateMode").classList.toggle("active",mode==="private");
  $("publicTools").classList.toggle("hidden",mode!=="public");$("privateTools").classList.toggle("hidden",mode!=="private");
  $("messageForm").classList.toggle("hidden",mode==="private"&&!privateRecipient);
  $("imageFile").parentElement.classList.toggle("hidden",mode==="private");
@@ -71,7 +71,7 @@ $("recipientForm").addEventListener("submit",async e=>{
   if(error)throw error;if(!data?.length)throw new Error("این نام کاربری پیدا نشد؛ مطمئن شو طرف مقابل قبلاً ثبت‌نام کرده است.");
   if(data.length>1)throw new Error("چند حساب با این نام وجود دارد؛ نام دقیق نمایش‌داده‌شده را وارد کن.");
   if(data[0].id===currentUser.id)throw new Error("نمی‌توانی به خودت پیام بدهی.");
-  privateRecipient=data[0];$("privateWith").textContent="گفتگوی خصوصی با "+privateRecipient.username;$("messageForm").classList.remove("hidden");await loadMessages();subscribeMessages();
+  privateRecipient=data[0];$("chatTitle").textContent="گفتگوی خصوصی با "+privateRecipient.username;$("privateWith").textContent="گفتگوی خصوصی با "+privateRecipient.username;$("messageForm").classList.remove("hidden");await loadMessages();subscribeMessages();
  }catch(x){notify(x.message)}finally{b.disabled=false}
 });
 $("numberForm").addEventListener("submit",async e=>{e.preventDefault();const value=$("numberValue").value.trim();if(value===""||!Number.isFinite(Number(value)))return notify("یک عدد معتبر وارد کن.");const b=$("sendNumber");b.disabled=true;try{const {error}=await supabase.from("messages").insert({user_id:currentUser.id,username:myName(),content:"🔢 عدد ثبت‌شده: "+value,image_url:null});if(error)throw error;$("numberValue").value=""}catch(x){notify("ارسال عدد انجام نشد: "+x.message)}finally{b.disabled=false}});
