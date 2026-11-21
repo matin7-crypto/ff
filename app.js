@@ -8,7 +8,7 @@ function notify(m){const e=$("notice");e.textContent=m;e.classList.add("show");c
 function setConnection(t){$("connection").textContent=t}
 function usernameEmail(name){const slug=Array.from(name.trim().toLocaleLowerCase("fa")).map(c=>c.codePointAt(0).toString(16)).join("-");return slug+"@users.hamsobat.invalid";}
 function show(v){setup.classList.toggle("hidden",v!=="setup");auth.classList.toggle("hidden",v!=="auth");chat.classList.toggle("hidden",v!=="chat")}
-function setAuthMode(s){isSignup=s;$("signupTab").classList.toggle("active",s);$("loginTab").classList.toggle("active",!s);$("nameLabel").classList.toggle("hidden",!s);$("displayName").classList.toggle("hidden",!s);$("displayName").required=s;$("authSubmit").textContent=s?"ساخت حساب":"ورود";$("password").autocomplete=s?"new-password":"current-password"}
+function setAuthMode(s){isSignup=s;$("signupTab").classList.toggle("active",s);$("loginTab").classList.toggle("active",!s);$("authSubmit").textContent=s?"ساخت حساب":"ورود";$("password").autocomplete=s?"new-password":"current-password"}
 function renderMessage(m){
  const empty=$("messages").querySelector(".empty");if(empty)empty.remove();
  const a=document.createElement("article");a.className="message"+(m.user_id===currentUser?.id?" mine":"");
