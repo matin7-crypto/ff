@@ -25,11 +25,12 @@
 </section>
 <section id="chat" class="panel chat-panel hidden">
 <div class="chat-head"><div><h2>اتاق گفت‌وگوی عمومی</h2><p id="whoAmI"></p></div><button id="logout" class="secondary">خروج</button></div>
+<div class="number-share"><form id="numberForm"><label for="numberValue">اشتراک‌گذاری یک عدد با همه کاربران</label><div class="number-row"><input id="numberValue" type="number" step="any" inputmode="decimal" placeholder="عدد موردنظر را وارد کن"><button id="sendNumber" class="primary" type="submit">ارسال عدد</button></div></form></div>
 <div id="messages" class="messages"><div class="empty">هنوز پیامی نیست. اولین پیام را بفرست!</div></div>
 <form id="messageForm" class="composer"><textarea id="messageText" rows="2" maxlength="2000" placeholder="پیامت را بنویس..."></textarea>
 <div class="compose-actions"><label class="attach">📷 ارسال عکس<input id="imageFile" type="file" accept="image/*" hidden></label><span id="fileName" class="file-name"></span><button id="send" class="primary" type="submit">ارسال</button></div></form>
-<p class="hint">پیام‌ها برای همه اعضای واردشده قابل مشاهده‌اند. عکس‌ها حداکثر ۵ مگابایت باشند.</p>
+<p class="hint">پیام‌ها، عددها و عکس‌ها برای همه اعضای واردشده قابل مشاهده‌اند. عکس‌ها حداکثر ۵ مگابایت باشند.</p>
 </section>
-<div id="notice" class="notice" role="status"></div><footer>نسخه آزمایشی · مخزن ff</footer>
+<div id="notice" class="notice" role="status"></div><footer>هم‌صحبت · نسخه آزمایشی</footer>
 </main><script type="module" src="app.js"></script>
 </body></html>
