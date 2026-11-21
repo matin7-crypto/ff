@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111827"><title>هم‌صحبت | گفت‌وگوی آنلاین</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="shell">
+<header class="topbar"><div class="brand-mark">هـ</div><div><h1>هم‌صحبت</h1><p>یک گفت‌وگوی ساده و آنلاین</p></div><span id="connection" class="connection">آماده اتصال</span></header>
+<section id="setup" class="panel setup-panel">
+<h2>راه‌اندازی اولیه</h2><p>برای آنلاین شدن برنامه، یک پروژه رایگان در Supabase بساز و آدرس پروژه و کلید عمومی آن را اینجا وارد کن. راهنمای کامل در فایل README قرار دارد.</p>
+<label>آدرس پروژه Supabase</label><input id="supabaseUrl" type="url" placeholder="https://xxxx.supabase.co" autocomplete="url">
+<label>کلید عمومی (anon / publishable)</label><input id="supabaseKey" type="password" placeholder="کلید عمومی پروژه" autocomplete="off">
+<button id="saveConfig" class="primary">اتصال به سرور</button><p class="hint">کلیدهای secret یا service_role را هرگز اینجا وارد نکن.</p>
+</section>
+<section id="auth" class="panel hidden">
+<div class="tabs"><button id="loginTab" class="tab active">ورود</button><button id="signupTab" class="tab">ثبت‌نام</button></div>
+<form id="authForm">
+<label id="nameLabel" class="hidden">نام نمایشی</label><input id="displayName" class="hidden" maxlength="32" placeholder="مثلاً متین">
+<label>ایمیل</label><input id="email" type="email" required autocomplete="email" placeholder="name@example.com">
+<label>رمز عبور</label><input id="password" type="password" required minlength="6" autocomplete="current-password" placeholder="حداقل ۶ کاراکتر">
+<button class="primary" type="submit" id="authSubmit">ورود</button>
+</form><button id="editConfig" class="text-button">تغییر تنظیمات سرور</button>
+</section>
+<section id="chat" class="panel chat-panel hidden">
+<div class="chat-head"><div><h2>اتاق گفت‌وگوی عمومی</h2><p id="whoAmI"></p></div><button id="logout" class="secondary">خروج</button></div>
+<div id="messages" class="messages"><div class="empty">هنوز پیامی نیست. اولین پیام را بفرست!</div></div>
+<form id="messageForm" class="composer"><textarea id="messageText" rows="2" maxlength="2000" placeholder="پیامت را بنویس..."></textarea>
+<div class="compose-actions"><label class="attach">📷 ارسال عکس<input id="imageFile" type="file" accept="image/*" hidden></label><span id="fileName" class="file-name"></span><button id="send" class="primary" type="submit">ارسال</button></div></form>
+<p class="hint">پیام‌ها برای همه اعضای واردشده قابل مشاهده‌اند. عکس‌ها حداکثر ۵ مگابایت باشند.</p>
+</section>
+<div id="notice" class="notice" role="status"></div><footer>نسخه آزمایشی · مخزن ff</footer>
+</main><script type="module" src="app.js"></script>
+</body></html>
