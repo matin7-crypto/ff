@@ -42,6 +42,14 @@ $("authForm").addEventListener("submit",async e=>{
   else{const {error}=await supabase.auth.signInWithPassword({email,password});if(error)throw error}
  }catch(x){notify(x.message)}finally{b.disabled=false}
 });
+$("numberForm").addEventListener("submit",async e=>{
+ e.preventDefault();const value=$("numberValue").value.trim();if(value===""||!Number.isFinite(Number(value)))return notify("یک عدد معتبر وارد کن.");
+ const b=$("sendNumber");b.disabled=true;
+ try{const username=currentUser.user_metadata?.display_name||currentUser.email?.split("@")[0]||"کاربر";
+ const {error}=await supabase.from("messages").insert({user_id:currentUser.id,username,content:"🔢 عدد ثبت‌شده: "+value,image_url:null});if(error)throw error;
+ $("numberValue").value="";
+ }catch(x){notify("ارسال عدد انجام نشد: "+x.message)}finally{b.disabled=false}
+});
 $("logout").addEventListener("click",async()=>{const {error}=await supabase.auth.signOut();if(error)notify(error.message)});
 $("imageFile").addEventListener("change",e=>{
  selectedImage=e.target.files?.[0]||null;$("fileName").textContent=selectedImage?selectedImage.name:"";
