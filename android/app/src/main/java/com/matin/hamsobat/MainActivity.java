@@ -39,7 +39,8 @@ public class MainActivity extends Activity {
             }
         });
         setContentView(webView);
-        webView.loadUrl("https://matin7-crypto.github.io/ff/");
+        webView.clearCache(true);
+        webView.loadUrl("https://matin7-crypto.github.io/ff/?v=20261121");
     }
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
