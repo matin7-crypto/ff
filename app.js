@@ -6,7 +6,7 @@ const setup=$("setup"),auth=$("auth"),chat=$("chat");
 let supabase,currentUser,channel,isSignup=false,selectedImage=null,noticeTimer;
 function notify(m){const e=$("notice");e.textContent=m;e.classList.add("show");clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>e.classList.remove("show"),4500)}
 function setConnection(t){$("connection").textContent=t}
-function usernameEmail(name){const bytes=new TextEncoder().encode(name.trim().toLocaleLowerCase("fa"));let binary="";bytes.forEach(b=>binary+=String.fromCharCode(b));return btoa(binary).replace(/\\+/g,"-").replace(/\\//g,"_").replace(/=+$/g,"")+"@users.hamsobat.invalid";}
+function usernameEmail(name){const slug=Array.from(name.trim().toLocaleLowerCase("fa")).map(c=>c.codePointAt(0).toString(16)).join("-");return slug+"@users.hamsobat.invalid";}
 function show(v){setup.classList.toggle("hidden",v!=="setup");auth.classList.toggle("hidden",v!=="auth");chat.classList.toggle("hidden",v!=="chat")}
 function setAuthMode(s){isSignup=s;$("signupTab").classList.toggle("active",s);$("loginTab").classList.toggle("active",!s);$("nameLabel").classList.toggle("hidden",!s);$("displayName").classList.toggle("hidden",!s);$("displayName").required=s;$("authSubmit").textContent=s?"ساخت حساب":"ورود";$("password").autocomplete=s?"new-password":"current-password"}
 function renderMessage(m){
