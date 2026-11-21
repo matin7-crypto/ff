@@ -24,11 +24,13 @@
 </section>
 <section id="chat" class="panel chat-panel hidden">
 <div class="chat-head"><div><h2>اتاق گفت‌وگوی عمومی</h2><p id="whoAmI"></p></div><button id="logout" class="secondary">خروج</button></div>
-<div class="number-share"><form id="numberForm"><label for="numberValue">اشتراک‌گذاری یک عدد با همه کاربران</label><div class="number-row"><input id="numberValue" type="number" step="any" inputmode="decimal" placeholder="عدد موردنظر را وارد کن"><button id="sendNumber" class="primary" type="submit">ارسال عدد</button></div></form></div>
+<div class="chat-modes"><button id="publicMode" class="tab active" type="button">گفت‌وگوی عمومی</button><button id="privateMode" class="tab" type="button">پیام خصوصی</button></div>
+<div id="publicTools"><div class="number-share"><form id="numberForm"><label for="numberValue">اشتراک‌گذاری یک عدد با همه کاربران</label><div class="number-row"><input id="numberValue" type="number" step="any" inputmode="decimal" placeholder="عدد موردنظر را وارد کن"><button id="sendNumber" class="primary" type="submit">ارسال عدد</button></div></form></div></div>
+<div id="privateTools" class="private-tools hidden"><form id="recipientForm"><label for="recipientName">نام کاربری شخص موردنظر</label><div class="number-row"><input id="recipientName" type="text" placeholder="نام کاربری دقیق را وارد کن" autocomplete="off"><button class="primary" type="submit">شروع گفتگو</button></div></form><p id="privateWith" class="hint">برای شروع، نام کاربری طرف مقابل را وارد کن.</p></div>
 <div id="messages" class="messages"><div class="empty">هنوز پیامی نیست. اولین پیام را بفرست!</div></div>
 <form id="messageForm" class="composer"><textarea id="messageText" rows="2" maxlength="2000" placeholder="پیامت را بنویس..."></textarea>
 <div class="compose-actions"><label class="attach">📷 ارسال عکس<input id="imageFile" type="file" accept="image/*" hidden></label><span id="fileName" class="file-name"></span><button id="send" class="primary" type="submit">ارسال</button></div></form>
-<p class="hint">پیام‌ها، عددها و عکس‌ها برای همه اعضای واردشده قابل مشاهده‌اند. عکس‌ها حداکثر ۵ مگابایت باشند.</p>
+<p id="chatHint" class="hint">پیام‌های این بخش برای همه کاربران قابل مشاهده‌اند. در گفت‌وگوی خصوصی فقط دو طرف گفتگو پیام‌ها را می‌بینند.</p>
 </section>
 <div id="notice" class="notice" role="status"></div><footer>هم‌صحبت · نسخه آزمایشی</footer>
 </main><script type="module" src="app.js"></script>
