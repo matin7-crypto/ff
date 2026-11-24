@@ -14,33 +14,45 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Extract project
-        run: |
-          mkdir -p weekly-planner
-          unzip -oq weekly-planner/source.zip -d /tmp/weekly-planner
-          cp -R /tmp/weekly-planner/planner-app/. weekly-planner/
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
-      - name: Install dependencies and Android platform
+          java-version: "17"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Extract Flutter project
+        run: |
+          base64 -d weekly-planner/source.zip.b64 > /tmp/weekly-planner.zip
+          mkdir -p weekly-planner
+          unzip -oq /tmp/weekly-planner.zip -d /tmp/weekly-planner
+          cp -R /tmp/weekly-planner/weekly-planner-flutter/. weekly-planner/
+
+      - name: Generate Android platform
         working-directory: weekly-planner
-        run: |
-          npm install
-          npx cap add android
-          npx cap sync android
+        run: flutter create --platforms=android --org com.matin.weeklyplanner .
+
+      - name: Install packages
+        working-directory: weekly-planner
+        run: flutter pub get
+
+      - name: Configure Android notifications
+        working-directory: weekly-planner
+        run: python3 tool/patch_android.py
+
       - name: Build debug APK
-        working-directory: weekly-planner/android
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug
+        working-directory: weekly-planner
+        run: flutter build apk --debug
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: weekly-planner-apk
-          path: weekly-planner/android/app/build/outputs/apk/debug/app-debug.apk
+          path: weekly-planner/build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
