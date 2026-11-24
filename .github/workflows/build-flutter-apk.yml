@@ -1,0 +1,62 @@
+name: Build Flutter APK
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - '.flutter-upload/**'
+      - '.github/workflows/build-flutter-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Reconstruct Flutter source archive
+        shell: bash
+        run: |
+          cat .flutter-upload/part-*.txt | base64 --decode > "$RUNNER_TEMP/weekly-planner-flutter.zip"
+          mkdir -p flutter-project
+          unzip -q "$RUNNER_TEMP/weekly-planner-flutter.zip" -d "$RUNNER_TEMP/flutter-src"
+          cp -a "$RUNNER_TEMP/flutter-src/weekly-planner-flutter/." flutter-project/
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Generate Android platform
+        working-directory: flutter-project
+        run: flutter create --platforms=android --org com.example --project-name weekly_planner .
+
+      - name: Patch Android configuration
+        working-directory: flutter-project
+        run: python3 tool/patch_android.py
+
+      - name: Get Flutter dependencies
+        working-directory: flutter-project
+        run: flutter pub get
+
+      - name: Build release APK
+        working-directory: flutter-project
+        run: flutter build apk --release --no-shrink
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-planner-flutter-apk
+          path: flutter-project/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 14
