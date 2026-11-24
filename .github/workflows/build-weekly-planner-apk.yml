@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - ".build-source/**"
+      - "weekly-planner/source.zip"
       - "weekly-planner/**"
       - ".github/workflows/build-weekly-planner-apk.yml"
   workflow_dispatch:
@@ -15,42 +15,36 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
-
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
-
-      - name: Extract Flutter project
+      - name: Extract uploaded project
         run: |
-          cat .build-source/source.part-* | base64 -d > /tmp/weekly-planner.zip
-          mkdir -p weekly-planner
-          unzip -oq /tmp/weekly-planner.zip -d /tmp/weekly-planner
-          cp -R /tmp/weekly-planner/weekly-planner-flutter/. weekly-planner/
-
+          mkdir -p /tmp/project weekly-planner
+          unzip -oq weekly-planner/source.zip -d /tmp/project
+          APP_DIR="$(dirname "$(find /tmp/project -name pubspec.yaml -print -quit)")"
+          if [ "$APP_DIR" = "." ] || [ ! -f "$APP_DIR/pubspec.yaml" ]; then
+            echo "No pubspec.yaml found in uploaded source.zip"
+            find /tmp/project -maxdepth 4 -type f | head -100
+            exit 1
+          fi
+          cp -R "$APP_DIR"/. weekly-planner/
       - name: Generate Android platform
         working-directory: weekly-planner
         run: flutter create --platforms=android --org com.matin.weeklyplanner .
-
       - name: Install packages
         working-directory: weekly-planner
         run: flutter pub get
-
-      - name: Configure Android notifications
-        working-directory: weekly-planner
-        run: python3 tool/patch_android.py
-
       - name: Build debug APK
         working-directory: weekly-planner
         run: flutter build apk --debug
-
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
