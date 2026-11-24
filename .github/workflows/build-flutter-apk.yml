@@ -21,8 +21,11 @@ jobs:
         shell: bash
         run: |
           cat .flutter-upload/part-*.txt | base64 --decode > "$RUNNER_TEMP/weekly-planner-flutter.zip"
-          mkdir -p flutter-project
-          unzip -q "$RUNNER_TEMP/weekly-planner-flutter.zip" -d "$RUNNER_TEMP/flutter-src"
+          mkdir -p "$RUNNER_TEMP/flutter-src" flutter-project
+          sudo apt-get update
+          sudo apt-get install -y zip
+          zip -FF "$RUNNER_TEMP/weekly-planner-flutter.zip" --out "$RUNNER_TEMP/repaired.zip" || true
+          unzip -q "$RUNNER_TEMP/repaired.zip" -d "$RUNNER_TEMP/flutter-src"
           cp -a "$RUNNER_TEMP/flutter-src/weekly-planner-flutter/." flutter-project/
 
       - name: Set up Java
