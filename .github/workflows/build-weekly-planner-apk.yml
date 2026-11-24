@@ -1,11 +1,10 @@
-name: Build Weekly Planner APK
+name: Build Discipline APK
 
 on:
   push:
     branches: [main]
     paths:
       - "weekly-planner/source.zip"
-      - "weekly-planner/**"
       - ".github/workflows/build-weekly-planner-apk.yml"
   workflow_dispatch:
 
@@ -15,49 +14,37 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "21"
-      - name: Extract uploaded Capacitor project
+          java-version: "17"
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Extract Flutter project
         run: |
-          mkdir -p /tmp/project weekly-planner
-          unzip -oq weekly-planner/source.zip -d /tmp/project
-          APP_DIR="$(dirname "$(find /tmp/project -name package.json -print -quit)")"
-          if [ "$APP_DIR" = "." ] || [ ! -f "$APP_DIR/package.json" ]; then
-            echo "No package.json found in uploaded source.zip"
-            exit 1
-          fi
-          cp -R "$APP_DIR"/. weekly-planner/
-          cat weekly-planner/package.json
-          cat weekly-planner/capacitor.config.json
-      - name: Install Node dependencies
-        working-directory: weekly-planner
+          mkdir -p /tmp/discipline
+          unzip -oq weekly-planner/source.zip -d /tmp/discipline
+          cp -R /tmp/discipline/weekly-planner-flutter/. .
+      - name: Set app name
         run: |
-          npm install
-          if [ ! -x node_modules/.bin/cap ]; then
-            npm install --save-dev @capacitor/cli@7
-          fi
-          if [ ! -d node_modules/@capacitor/android ]; then
-            CORE_VERSION="$(node -p "require('./node_modules/@capacitor/core/package.json').version.split('.')[0]" 2>/dev/null || echo 7)"
-            npm install @capacitor/android@"$CORE_VERSION"
-          fi
+          sed -i 's/^name: weekly_planner$/name: discipline/' pubspec.yaml
+          sed -i 's/برنامه هفتگی/Discipline/g' tool/patch_android.py
+          sed -i "s/title: 'برنامه هفتگی'/title: 'Discipline'/" lib/main.dart
       - name: Generate Android project
-        working-directory: weekly-planner
-        run: |
-          if [ ! -d android ]; then npx cap add android; fi
-          npx cap sync android
-      - name: Build debug APK
-        working-directory: weekly-planner/android
-        run: ./gradlew assembleDebug
+        run: flutter create --platforms=android --org com.discipline --project-name discipline .
+      - name: Patch Android settings
+        run: python3 tool/patch_android.py
+      - name: Get packages
+        run: flutter pub get
+      - name: Build release APK
+        run: flutter build apk --release --no-shrink
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: weekly-planner-apk
-          path: weekly-planner/android/app/build/outputs/apk/debug/app-debug.apk
+          name: discipline-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
