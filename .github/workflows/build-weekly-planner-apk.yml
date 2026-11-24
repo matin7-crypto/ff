@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - ".build-source/**"
       - "weekly-planner/**"
       - ".github/workflows/build-weekly-planner-apk.yml"
   workflow_dispatch:
@@ -29,7 +30,7 @@ jobs:
 
       - name: Extract Flutter project
         run: |
-          base64 -d weekly-planner/source.zip.b64 > /tmp/weekly-planner.zip
+          cat .build-source/source.part-* | base64 -d > /tmp/weekly-planner.zip
           mkdir -p weekly-planner
           unzip -oq /tmp/weekly-planner.zip -d /tmp/weekly-planner
           cp -R /tmp/weekly-planner/weekly-planner-flutter/. weekly-planner/
